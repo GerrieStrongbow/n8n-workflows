@@ -1,0 +1,502 @@
+{
+  "name": "Image Spinner (1 Click = 1000 Ad Creatives)",
+  "nodes": [
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "filter": {
+          "folderId": {
+            "__rl": true,
+            "value": "166RUrMWPirM9_00dBcP3oI8TA4v2yUb8",
+            "mode": "list",
+            "cachedResultName": "1. Source Folder",
+            "cachedResultUrl": "https://drive.google.com/drive/folders/166RUrMWPirM9_00dBcP3oI8TA4v2yUb8"
+          }
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        220,
+        40
+      ],
+      "id": "313ffb95-c922-40de-8a59-4199852e1d85",
+      "name": "Google Drive",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "8R2NiLt8owCA0E2O",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        440,
+        40
+      ],
+      "id": "35e7937c-78df-45ad-8171-1bdf94a7ddfa",
+      "name": "Google Drive1",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "8R2NiLt8owCA0E2O",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "GPT-4O"
+        },
+        "text": "What's in this image? Describe it extremely comprehensively. Leave nothing out.",
+        "inputType": "base64",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        660,
+        40
+      ],
+      "id": "b46370e8-bd3f-4932-a5ed-7858d88c0eef",
+      "name": "OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "oLLACDYfGm4C4ouV",
+          "name": "YouTube "
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4.1",
+          "mode": "list",
+          "cachedResultName": "GPT-4.1"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "You're a helpful, intelligent prompt rewriting assistant. You help rewrite prompts.",
+              "role": "system"
+            },
+            {
+              "content": "=I've generated an image description. I want you to take that image description and then give me a simple \"change request\" prompt I can use to tell an AI image editor what changes to make.\n\nReturn your output in the following JSON format:\n\n{\"variants\":[\"First change request\", \"Second change request\", \"Third change request\", \"etc\"]}\n\nRules:\n- Your task is to generate *new* change suggestions that we will later feed into an image generation model.\n- Changes you can make: font style (serif, sans-serif, display), font size, font leading, font tracking, font color, saturation, brightness, background color, background patterns, design style (flat, minimalistic, sleek, photoreal, etc—go nuts here), colors of assets on the page, swapping one asset for another that is more related to the change request.\n- Make these changes reasonable—we want to stick to the source pretty closely. Do not suggest any meaningful changes to the placement of assets. We want the elements all in the exact same place in the image, so only ever suggest color, style, asset type, font type, or copy changes.\n- Use the provided company name in the change request—never the original company name.\n- Generate {{$('When Executed by Another Workflow').item.json.numberOfSamples}} change requests. No more, no less.\n- If the provided change request from the user is too short (i.e the image description features text that is longer), come up with your own copy in the variants so that the provided text and the text in the original image description is 1:1 length wise.\n"
+            },
+            {
+              "content": "{\"originalDescription\":\"The image features a promotional graphic with a bright blue background. Centered on the left is a layered design element consisting of two images. The top image shows a person sitting with a laptop, smiling, wearing a white jacket and blue jeans, with a background of green leaves and plants. Below this image is what appears to be a partially visible document with text and a table. \\n\\nSuperimposed at the top of the image is a white download arrow icon. Beneath the images, the text reads, \"Change your practice management software,\" in bold white lettering, with the words partially highlighted by a darker blue rectangle. This suggests a call to action or advertisement for software related to practice management.\", \"changeRequest\":\"Make it a soft, pastel orange; change text to something like 'Upgrade your systems today'. LeftClick logo with a mouse pointer icon (bottom right)\"}"
+            },
+            {
+              "content": "{\"variants\":[\n  \"Make the background bright orange, swap the text for 'Upgrade your systems today', change it to sans-serif. Add a LeftClick logo with a mouse pointer icon positioned in the bottom right corner. Slightly more upscale style.\",\n  \"Switch the background to a clean white. Update the headline to say 'Optimize with LeftClick.' and clean, minimalistic serif font. Place the LeftClick logo and a minimalist arrow cursor icon in the top-left corner.\",\n  \"Set the background to a gradient from deep blue to turquoise. Change the text to 'Smarter systems start here.', play with the leading and tracking and make it a standout display font. Keep the LeftClick logo in the bottom right, but make it semi-transparent.\",\n  \"Use a charcoal grey background with high-contrast white text that says 'LeftClick powers performance.' Include a small pointer icon beside the logo in the bottom center.\",\n  \"Make the background electric lime green. Replace the message with 'Your automation partner: LeftClick.' Mouse pointer icon next to the logo in the lower-right, make the fonts hyper stylized.\"\n]\n}"
+            },
+            {
+              "content": "={\"originalDescription\":\"{{ $json.content }}\", \"changeRequest\":\"{{$('When Executed by Another Workflow').item.json.imagePrompt}}\"} "
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {
+          "temperature": 0.7
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        880,
+        40
+      ],
+      "id": "85ee3ab5-f95b-435e-8ae7-e97e7b51ec61",
+      "name": "OpenAI1",
+      "credentials": {
+        "openAiApi": {
+          "id": "oLLACDYfGm4C4ouV",
+          "name": "YouTube "
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/images/edits",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "openAiApi",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "model",
+              "value": "gpt-image-1"
+            },
+            {
+              "parameterType": "formBinaryData",
+              "name": "image[]",
+              "inputDataFieldName": "data"
+            },
+            {
+              "name": "prompt",
+              "value": "=Your task is to generate an image.\n\nHere is your prompt:\n\n{{ $('Loop Over Items').item.json['message.content.variants'] }}\n\nRules:\n- Stick as closely as possible to the outlines of the source document.\n- Change text, colors, shapes, and styles only if explicitly specified in the prompt. If something is not specified, do not change it.\n- If there is an actor and no style is specified, change the way they look a little so it's not the same actor. Only do this if the desired style is not a rendered, drawing, or cartoon version of them."
+            },
+            {
+              "name": "size",
+              "value": "1024x1024"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        440,
+        500
+      ],
+      "id": "de617d81-493f-46cd-89b4-d330ec4c6be7",
+      "name": "Generate Image Using GPT Image 1",
+      "executeOnce": true,
+      "credentials": {
+        "openAiApi": {
+          "id": "kRhXLl2JwVGc05AE",
+          "name": "AI Facebook Ad Analyzer"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "toBinary",
+        "sourceProperty": "data[0].b64_json",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        660,
+        500
+      ],
+      "id": "6480af0c-2936-4ae7-87b6-836308ef9285",
+      "name": "Convert to File"
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $('Google Drive').item.json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        220,
+        500
+      ],
+      "id": "4bc4015f-439b-40ff-b433-5155d799d727",
+      "name": "Google Drive2",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "8R2NiLt8owCA0E2O",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        0,
+        500
+      ],
+      "id": "d15fb4f5-642c-486f-be4b-8454f00c87e0",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "name": "={{ $now.toString() }}",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "1BlZr5pTDJJQqZubu7-AYFpjEWeRDutp6",
+          "mode": "list",
+          "cachedResultName": "2. Destination Folder",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1BlZr5pTDJJQqZubu7-AYFpjEWeRDutp6"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        880,
+        500
+      ],
+      "id": "86307d38-de6a-4d06-a0c8-e7d6ca5fb525",
+      "name": "Google Drive3",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "8R2NiLt8owCA0E2O",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "message.content.variants",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        1220,
+        40
+      ],
+      "id": "64972ad0-459a-43d7-9d79-6b51c18cb71e",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1100,
+        560
+      ],
+      "id": "32bdeef1-1cf8-4b69-b163-52333c92909b",
+      "name": "Wait",
+      "webhookId": "211033bc-481f-4d6a-adc8-0fef63f71071"
+    },
+    {
+      "parameters": {
+        "resource": "draft",
+        "subject": "Your design creative is ready.",
+        "message": "=Hello,\n\nThis is a friendly update to let you know that your recent batch of design creatives is ready.\n\nJust click this link:\n\nhttps://drive.google.com/drive/folders/1BlZr5pTDJJQqZubu7-AYFpjEWeRDutp6?usp=sharing\n\nThanks,\nAI Designer\n",
+        "options": {
+          "sendTo": "nickolassaraev@gmail.com"
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        220,
+        300
+      ],
+      "id": "753d7413-29d8-4b5d-b229-037a8be1e7f4",
+      "name": "Gmail",
+      "webhookId": "5fa97177-53f9-4f5f-bc45-261eda84840e",
+      "executeOnce": true,
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "fhD8H5s1MrHGhcsj",
+          "name": "Gmail account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "imagePrompt"
+            },
+            {
+              "name": "numberOfSamples"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        40
+      ],
+      "id": "b6bfac8a-cf3a-46ff-a0e1-bfe1e3893c78",
+      "name": "When Executed by Another Workflow"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Google Drive": {
+      "main": [
+        [
+          {
+            "node": "Google Drive1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive1": {
+      "main": [
+        [
+          {
+            "node": "OpenAI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI": {
+      "main": [
+        [
+          {
+            "node": "OpenAI1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI1": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Image Using GPT Image 1": {
+      "main": [
+        [
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Gmail",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Google Drive2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive2": {
+      "main": [
+        [
+          {
+            "node": "Generate Image Using GPT Image 1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File": {
+      "main": [
+        [
+          {
+            "node": "Google Drive3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive3": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Google Drive",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "7f19fbda-360f-4d51-b734-d8119d5fc75c",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "d7661a849ead114a9aa6d9ceaf4160465aeb79532a35bde62160c840ffba9fc8"
+  },
+  "id": "LC63Rds4BtoF8BCU",
+  "tags": [
+    {
+      "createdAt": "2025-01-23T18:12:52.273Z",
+      "updatedAt": "2025-01-23T18:12:52.273Z",
+      "id": "l8MPK4ZirgwFWMno",
+      "name": "N8N Course"
+    }
+  ]
+}

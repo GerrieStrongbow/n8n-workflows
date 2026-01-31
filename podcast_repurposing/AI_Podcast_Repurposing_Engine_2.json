@@ -1,0 +1,700 @@
+{
+  "name": "AI PODCAST REPURPOSING ENGINE (2)",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 7
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -100,
+        0
+      ],
+      "id": "8e36de06-f320-44da-aa99-aedd456f47dd",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1nygJkUJJCotBuqSzVnShPhFzROZW9Po_wGzC9ftt0Aw",
+          "mode": "list",
+          "cachedResultName": "AI Podcast Repurposing Engine Content Calendar",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1nygJkUJJCotBuqSzVnShPhFzROZW9Po_wGzC9ftt0Aw/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 496654498,
+          "mode": "list",
+          "cachedResultName": "Instagram",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1nygJkUJJCotBuqSzVnShPhFzROZW9Po_wGzC9ftt0Aw/edit#gid=496654498"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "postedOn"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        180,
+        -180
+      ],
+      "id": "aa0434f0-a655-4b03-90a3-19620b6ca694",
+      "name": "Check Instagram Posts",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "06fihJgQOwWsguVO",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1nygJkUJJCotBuqSzVnShPhFzROZW9Po_wGzC9ftt0Aw",
+          "mode": "list",
+          "cachedResultName": "AI Podcast Repurposing Engine Content Calendar",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1nygJkUJJCotBuqSzVnShPhFzROZW9Po_wGzC9ftt0Aw/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1896781665,
+          "mode": "list",
+          "cachedResultName": "LinkedIn",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1nygJkUJJCotBuqSzVnShPhFzROZW9Po_wGzC9ftt0Aw/edit#gid=1896781665"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "postedOn"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        180,
+        0
+      ],
+      "id": "1684ab83-4af0-46c3-9f8c-8182c378561e",
+      "name": "Check LinkedIn Posts",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "06fihJgQOwWsguVO",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1nygJkUJJCotBuqSzVnShPhFzROZW9Po_wGzC9ftt0Aw",
+          "mode": "list",
+          "cachedResultName": "AI Podcast Repurposing Engine Content Calendar",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1nygJkUJJCotBuqSzVnShPhFzROZW9Po_wGzC9ftt0Aw/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Facebook",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1nygJkUJJCotBuqSzVnShPhFzROZW9Po_wGzC9ftt0Aw/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "postedOn"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        180,
+        180
+      ],
+      "id": "d5253ad2-7f29-4e6b-b468-cdce707894f4",
+      "name": "Check Facebook Posts",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "06fihJgQOwWsguVO",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.postImage }}",
+        "options": {
+          "allowUnauthorizedCerts": true
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        360,
+        0
+      ],
+      "id": "58c7ef69-d336-43f0-ae8b-4d4ae648e5c3",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "httpRequestMethod": "POST",
+        "graphApiVersion": "v17.0",
+        "node": "me",
+        "edge": "photos",
+        "allowUnauthorizedCerts": "={{ false }}",
+        "options": {
+          "queryParameters": {
+            "parameter": [
+              {
+                "name": "message",
+                "value": "={{ $json.postBody }}"
+              },
+              {
+                "name": "url",
+                "value": "={{ $json.postImage }}"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.facebookGraphApi",
+      "typeVersion": 1,
+      "position": [
+        360,
+        180
+      ],
+      "id": "1dcb265b-fdac-42a9-b5f8-fd830f7cf71b",
+      "name": "Publish to Facebook",
+      "credentials": {
+        "facebookGraphApi": {
+          "id": "EbJbyDlXQWjWANGG",
+          "name": "Facebook Graph account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "postAs": "organization",
+        "organization": "91415714",
+        "text": "={{ $json.postBody }}",
+        "shareMediaCategory": "IMAGE",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.linkedIn",
+      "typeVersion": 1,
+      "position": [
+        540,
+        0
+      ],
+      "id": "0cdb8d75-4710-4982-9f61-1410494f30bf",
+      "name": "Publish to LinkedIn",
+      "credentials": {
+        "linkedInOAuth2Api": {
+          "id": "U8zmRuMG13ygjBfb",
+          "name": "LinkedIn account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpRequestMethod": "POST",
+        "graphApiVersion": "v17.0",
+        "node": "17841448359715989",
+        "edge": "media",
+        "allowUnauthorizedCerts": "={{ false }}",
+        "options": {
+          "queryParameters": {
+            "parameter": [
+              {
+                "name": "caption",
+                "value": "={{ $json.postBody }}"
+              },
+              {
+                "name": "image_url",
+                "value": "={{ $json.postImage }}"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.facebookGraphApi",
+      "typeVersion": 1,
+      "position": [
+        360,
+        -180
+      ],
+      "id": "756f8f27-505e-403b-bd28-e4dba3445602",
+      "name": "Upload to IG",
+      "credentials": {
+        "facebookGraphApi": {
+          "id": "CwDGe1pXnm3xsWL3",
+          "name": "Facebook Graph account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpRequestMethod": "POST",
+        "graphApiVersion": "v17.0",
+        "node": "17841448359715989",
+        "edge": "media_publish",
+        "allowUnauthorizedCerts": "={{ false }}",
+        "options": {
+          "queryParameters": {
+            "parameter": [
+              {
+                "name": "creation_id",
+                "value": "={{ $json.id }}"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.facebookGraphApi",
+      "typeVersion": 1,
+      "position": [
+        540,
+        -180
+      ],
+      "id": "aaa505ec-bee5-4310-b11d-10c82215409a",
+      "name": "Post on IG",
+      "credentials": {
+        "facebookGraphApi": {
+          "id": "EbJbyDlXQWjWANGG",
+          "name": "Facebook Graph account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1nygJkUJJCotBuqSzVnShPhFzROZW9Po_wGzC9ftt0Aw",
+          "mode": "list",
+          "cachedResultName": "AI Podcast Repurposing Engine Content Calendar",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1nygJkUJJCotBuqSzVnShPhFzROZW9Po_wGzC9ftt0Aw/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Facebook",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1nygJkUJJCotBuqSzVnShPhFzROZW9Po_wGzC9ftt0Aw/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "postImage": "={{ $('Check Facebook Posts').item.json.postImage }}",
+            "dateAdded": "={{ $('Check Facebook Posts').item.json.dateAdded }}",
+            "postBody": "={{ $('Check Facebook Posts').item.json.postBody }}",
+            "postedOn": "={{ $now.format('DD') }}"
+          },
+          "matchingColumns": [
+            "postImage"
+          ],
+          "schema": [
+            {
+              "id": "dateAdded",
+              "displayName": "dateAdded",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "postBody",
+              "displayName": "postBody",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "postImage",
+              "displayName": "postImage",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "postedOn",
+              "displayName": "postedOn",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        540,
+        180
+      ],
+      "id": "f1f2294f-dd28-4e70-9175-cd0933227bdf",
+      "name": "Update Google Sheets DB (FB)",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "06fihJgQOwWsguVO",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1nygJkUJJCotBuqSzVnShPhFzROZW9Po_wGzC9ftt0Aw",
+          "mode": "list",
+          "cachedResultName": "AI Podcast Repurposing Engine Content Calendar",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1nygJkUJJCotBuqSzVnShPhFzROZW9Po_wGzC9ftt0Aw/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1896781665,
+          "mode": "list",
+          "cachedResultName": "LinkedIn",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1nygJkUJJCotBuqSzVnShPhFzROZW9Po_wGzC9ftt0Aw/edit#gid=1896781665"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "postImage": "={{ $('Check LinkedIn Posts').item.json.postImage }}",
+            "dateAdded": "={{ $('Check LinkedIn Posts').item.json.dateAdded }}",
+            "postBody": "={{ $('Check LinkedIn Posts').item.json.postBody }}",
+            "postedOn": "={{ $now.format('DD') }}"
+          },
+          "matchingColumns": [
+            "postImage"
+          ],
+          "schema": [
+            {
+              "id": "dateAdded",
+              "displayName": "dateAdded",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "postBody",
+              "displayName": "postBody",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "postImage",
+              "displayName": "postImage",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "postedOn",
+              "displayName": "postedOn",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        720,
+        0
+      ],
+      "id": "d486c3a9-6dea-4872-919f-b4509681143d",
+      "name": "Update Google Sheets DB (LI)",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "06fihJgQOwWsguVO",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1nygJkUJJCotBuqSzVnShPhFzROZW9Po_wGzC9ftt0Aw",
+          "mode": "list",
+          "cachedResultName": "AI Podcast Repurposing Engine Content Calendar",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1nygJkUJJCotBuqSzVnShPhFzROZW9Po_wGzC9ftt0Aw/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 496654498,
+          "mode": "list",
+          "cachedResultName": "Instagram",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1nygJkUJJCotBuqSzVnShPhFzROZW9Po_wGzC9ftt0Aw/edit#gid=496654498"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "postImage": "={{ $('Check Instagram Posts').item.json.postImage }}",
+            "dateAdded": "={{ $('Check Instagram Posts').item.json.dateAdded }}",
+            "postBody": "={{ $('Check Instagram Posts').item.json.postBody }}",
+            "postedOn": "={{ $now.format('DD') }}"
+          },
+          "matchingColumns": [
+            "postImage"
+          ],
+          "schema": [
+            {
+              "id": "dateAdded",
+              "displayName": "dateAdded",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "postBody",
+              "displayName": "postBody",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "postImage",
+              "displayName": "postImage",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "postedOn",
+              "displayName": "postedOn",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        720,
+        -180
+      ],
+      "id": "5005ef06-c08f-4642-b936-408f2d629cbf",
+      "name": "Update Google Sheets DB (IG)",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "06fihJgQOwWsguVO",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Check Instagram Posts",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Check LinkedIn Posts",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Check Facebook Posts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Instagram Posts": {
+      "main": [
+        [
+          {
+            "node": "Upload to IG",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Facebook Posts": {
+      "main": [
+        [
+          {
+            "node": "Publish to Facebook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check LinkedIn Posts": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Publish to LinkedIn",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Publish to Facebook": {
+      "main": [
+        [
+          {
+            "node": "Update Google Sheets DB (FB)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload to IG": {
+      "main": [
+        [
+          {
+            "node": "Post on IG",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Publish to LinkedIn": {
+      "main": [
+        [
+          {
+            "node": "Update Google Sheets DB (LI)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Post on IG": {
+      "main": [
+        [
+          {
+            "node": "Update Google Sheets DB (IG)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "14ce7a0e-f229-40f7-b96e-9072a562984d",
+  "meta": {
+    "instanceId": "d7661a849ead114a9aa6d9ceaf4160465aeb79532a35bde62160c840ffba9fc8"
+  },
+  "id": "DLAByRWBQ7lwECe1",
+  "tags": []
+}

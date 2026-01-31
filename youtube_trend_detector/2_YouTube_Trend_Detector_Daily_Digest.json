@@ -1,0 +1,286 @@
+{
+  "name": "2. YouTube Trend Detector: Daily Digest",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "ab92e2f4-db64-4c50-a6c6-638fe630d335",
+      "name": "When clicking ‘Test workflow’"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1BMVakVEynzPaxaP-eGJO2P3xhvKI3fsMU8cvOyKn834",
+          "mode": "list",
+          "cachedResultName": "YouTube Trend Detector Database",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1BMVakVEynzPaxaP-eGJO2P3xhvKI3fsMU8cvOyKn834/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Channels",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1BMVakVEynzPaxaP-eGJO2P3xhvKI3fsMU8cvOyKn834/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        220,
+        0
+      ],
+      "id": "d7b58a88-7936-4b46-8c0d-d186bc4dbe31",
+      "name": "Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "EOibXIc4U8wcXyRR",
+          "name": "YouTube"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1BMVakVEynzPaxaP-eGJO2P3xhvKI3fsMU8cvOyKn834",
+          "mode": "list",
+          "cachedResultName": "YouTube Trend Detector Database",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1BMVakVEynzPaxaP-eGJO2P3xhvKI3fsMU8cvOyKn834/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "={{ $json.channel_id }}",
+          "mode": "name"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        640,
+        100
+      ],
+      "id": "16f1d526-7a37-41a1-b762-4f93c776a876",
+      "name": "Google Sheets1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "EOibXIc4U8wcXyRR",
+          "name": "YouTube"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        440,
+        0
+      ],
+      "id": "a8eb466e-7b70-4a72-9f66-7f68349e1075",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "04a57cb2-1cc9-4643-9f7d-5a75a292af07",
+              "leftValue": "={{ $json.views }}",
+              "rightValue": "={{ \n  $('Google Sheets1').all().reduce((sum, item) => sum + Number(item.json.views || 0), 0) \n  / $('Google Sheets1').all().length\n}}",
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        860,
+        100
+      ],
+      "id": "faf68684-f9b4-4438-81ac-dee6ddbad2fd",
+      "name": "Filter"
+    },
+    {
+      "parameters": {
+        "sendTo": "nickolassaraev@gmail.com",
+        "subject": "Daily Digest: Trending YouTube Videos",
+        "message": "=<!DOCTYPE html>\n<html>\n<head>\n  <meta charset=\"UTF-8\">\n  <style>\n    /* reset for email clients */\n    body, table, td { margin:0; padding:0; }\n    img { border:0; display:block; }\n    .wrapper { width:100%; background:#f7f7f7; padding:20px 0; }\n    .container { width:600px; margin:0 auto; background:#fff; border-radius:4px; overflow:hidden; }\n    .header { padding:20px; font-family:Arial,sans-serif; }\n    .header h2 { font-size:20px; margin:0; color:#222; }\n    .grid { width:100%; border-spacing:10px; }\n  </style>\n</head>\n<body>\n  <table class=\"wrapper\" cellpadding=\"0\" cellspacing=\"0\">\n    <tr>\n      <td align=\"center\">\n        <table class=\"container\" cellpadding=\"0\" cellspacing=\"0\">\n          <tr>\n            <td class=\"header\">\n              <h2>YouTube Trend Detector Digest, {{ $now.toLocaleString() }}</h2>\n            </td>\n          </tr>\n          <tr>\n            <td>\n              <table class=\"grid\" cellpadding=\"0\" cellspacing=\"0\">\n                {{ $('HTML').all().map(item => item.json.html) }}\n              </table>\n            </td>\n          </tr>\n        </table>\n      </td>\n    </tr>\n  </table>\n</body>\n</html>",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        860,
+        -100
+      ],
+      "id": "a3a4d611-13d9-4859-83b0-c7a0d9ae30a9",
+      "name": "Gmail",
+      "webhookId": "8d76f2ab-039a-472c-985d-b9006434b5f4",
+      "executeOnce": true,
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "fhD8H5s1MrHGhcsj",
+          "name": "Gmail account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5ee695c6-f00b-425e-9b2d-8d7067b70a64",
+              "name": "average",
+              "value": "={{    $('Google Sheets1').all().reduce((sum, item) => sum + Number(item.json.views || 0), 0)    / $('Google Sheets1').all().length }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1080,
+        100
+      ],
+      "id": "f61ac6fa-7ef8-4900-bb9b-9b8b207dce2b",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "html": "<tr>\n  <td width=\"50%\" valign=\"top\" style=\"padding:5px;\">\n    {{\n      '<table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" style=\"background:#fff;border-radius:4px;overflow:hidden;\">'\n      .concat('<tr><td style=\"padding:0;\">')\n      .concat('<img src=\"').concat($json.large_thumb).concat('\" alt=\"').concat($json.title)\n      .concat('\" style=\"width:100%;height:310px;object-fit:cover;object-position:center;\">')\n      .concat('</td></tr><tr><td style=\"padding:10px;font-family:Arial,sans-serif;\">')\n      .concat('<p style=\"font-size:14px;font-weight:bold;color:#222;margin:0 0 5px;\">')\n      .concat($json.title).concat('</p>')\n      .concat('<p style=\"font-size:12px;color:#666;margin:0 0 3px;\">')\n      .concat($json.channel_title).concat('</p>')\n      .concat('<p style=\"font-size:12px;color:#666;margin:0 0 3px;\"><strong>Multiple:</strong> ')\n      .concat(($json.views/$json.average).round(2)).concat('</p>')\n      .concat('<p style=\"font-size:12px;color:#666;margin:0;\">Duration: ')\n      .concat($json.duration).concat(' seconds</p>')\n      .concat('</td></tr></table>')\n    }}\n  </td>\n</tr>"
+      },
+      "type": "n8n-nodes-base.html",
+      "typeVersion": 1.2,
+      "position": [
+        640,
+        -100
+      ],
+      "id": "5e08c979-3304-4400-b790-7c07add87dfc",
+      "name": "HTML"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Test workflow’": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "HTML",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Google Sheets1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets1": {
+      "main": [
+        [
+          {
+            "node": "Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTML": {
+      "main": [
+        [
+          {
+            "node": "Gmail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "8b73d4ad-df63-4ca9-8b06-100d25fa8019",
+  "meta": {
+    "instanceId": "d7661a849ead114a9aa6d9ceaf4160465aeb79532a35bde62160c840ffba9fc8"
+  },
+  "id": "ZFeQDsZVUMILIoGp",
+  "tags": []
+}

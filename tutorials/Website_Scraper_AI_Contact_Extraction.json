@@ -1,0 +1,436 @@
+{
+  "name": "Your sixth workflow",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        32,
+        144
+      ],
+      "id": "1fbe25e1-0f44-4527-ae61-bf75e564cb0b",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-5",
+          "mode": "list",
+          "cachedResultName": "GPT-5"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "You're a helpful, intelligent website scraping assistant. You specialize in dental sites. ",
+              "role": "system"
+            },
+            {
+              "content": "Your task is to take as input a bunch of markdown data about a website. This data is relatively unformatted. It is not super clean. All you have to do is take all of the data that you are given and then summarize the website in one paragraph. Explain what the website is, what they do, any pertinent information about the website that is non-standard or unique, and then output it in the following JSON format:\n\n{\n  \"summary\":\"\",\n  \"sanitizedPhoneNumber\":\"\",\n  \"sanitizedEmailAddress\":\"\",\n}\n\nRules:\n- If no phone number or email address is present, leave those fields blank. \n- Always fill out summary. "
+            },
+            {
+              "content": "={{ $json.data.markdown }}"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {
+          "reasoning_effort": "low"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        1376,
+        0
+      ],
+      "id": "0c80762d-2258-42fd-8b93-cb3e82548828",
+      "name": "Message a model",
+      "credentials": {
+        "openAiApi": {
+          "id": "oLLACDYfGm4C4ouV",
+          "name": "YouTube "
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1pzFOIKlsgYAIQ1I_nJKnDpD3eTpn01eewmdp197auVM",
+          "mode": "list",
+          "cachedResultName": "Website Database",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1pzFOIKlsgYAIQ1I_nJKnDpD3eTpn01eewmdp197auVM/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1pzFOIKlsgYAIQ1I_nJKnDpD3eTpn01eewmdp197auVM/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        256,
+        144
+      ],
+      "id": "b0f55c19-8517-4fd9-a816-247039638784",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "5pnSWPrbjH12tR3W",
+          "name": "nick@nicksaraev.com (Oct 2 2025)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "38adf916-03fa-4dad-9395-39b5dc4b62f6",
+              "leftValue": "={{ $json[\"organization/website_url\"] }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        480,
+        144
+      ],
+      "id": "752e992b-0043-44e2-ac5f-15f60e196828",
+      "name": "Filter"
+    },
+    {
+      "parameters": {
+        "maxItems": 100
+      },
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        704,
+        144
+      ],
+      "id": "ee35e316-3f01-48d1-9ea1-d9ef965e4b64",
+      "name": "Limit"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1pzFOIKlsgYAIQ1I_nJKnDpD3eTpn01eewmdp197auVM",
+          "mode": "list",
+          "cachedResultName": "Website Database",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1pzFOIKlsgYAIQ1I_nJKnDpD3eTpn01eewmdp197auVM/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1pzFOIKlsgYAIQ1I_nJKnDpD3eTpn01eewmdp197auVM/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "organization/sanitized_phone": "={{ $json.message.content.sanitizedPhoneNumber }}",
+            "organization/sanitized_email": "={{ $json.message.content.sanitizedEmailAddress }}",
+            "organization/summary": "={{ $json.message.content.summary }}",
+            "row_number": "={{ $('Loop Over Items').item.json.row_number }}"
+          },
+          "matchingColumns": [
+            "row_number"
+          ],
+          "schema": [
+            {
+              "id": "organization_name",
+              "displayName": "organization_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "organization/website_url",
+              "displayName": "organization/website_url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "organization/raw_address",
+              "displayName": "organization/raw_address",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "organization/sanitized_phone",
+              "displayName": "organization/sanitized_phone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "organization/sanitized_email",
+              "displayName": "organization/sanitized_email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "organization/summary",
+              "displayName": "organization/summary",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1728,
+        0
+      ],
+      "id": "a517752d-2640-4ed9-a832-db4a3557f568",
+      "name": "Update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "5pnSWPrbjH12tR3W",
+          "name": "nick@nicksaraev.com (Oct 2 2025)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        928,
+        144
+      ],
+      "id": "f94894a6-8ee5-4aa2-bce2-53da18cfe532",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "amount": 1
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1952,
+        72
+      ],
+      "id": "9eddbb16-d19a-48df-98bd-7a77ef57d4a7",
+      "name": "Wait",
+      "webhookId": "29c6bf47-acd8-4237-812e-86e0e402c78d"
+    },
+    {
+      "parameters": {
+        "operation": "scrape",
+        "url": "={{ $json[\"organization/website_url\"] }}",
+        "scrapeOptions": {
+          "options": {
+            "formats": {
+              "format": [
+                {}
+              ]
+            },
+            "headers": {}
+          }
+        },
+        "requestOptions": {}
+      },
+      "type": "@mendable/n8n-nodes-firecrawl.firecrawl",
+      "typeVersion": 1,
+      "position": [
+        1152,
+        0
+      ],
+      "id": "fe40866c-668d-4bdb-ac3e-c8fd402d7ddf",
+      "name": "Scrape a url and get its content",
+      "credentials": {
+        "firecrawlApi": {
+          "id": "xwhhL1RMM4e3flKP",
+          "name": "nick@nicksaraev.com (Oct 26th, 2025)"
+        }
+      },
+      "onError": "continueErrorOutput"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter": {
+      "main": [
+        [
+          {
+            "node": "Limit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Scrape a url and get its content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Scrape a url and get its content": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "d63cbff6-d5be-49e3-8e2a-fe2ecfe85023",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "d7661a849ead114a9aa6d9ceaf4160465aeb79532a35bde62160c840ffba9fc8"
+  },
+  "id": "cc9kj25IKwSM04ya",
+  "tags": []
+}

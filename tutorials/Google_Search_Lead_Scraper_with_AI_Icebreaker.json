@@ -1,0 +1,519 @@
+{
+  "name": "Your seventh workflow",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        64,
+        144
+      ],
+      "id": "1fbe25e1-0f44-4527-ae61-bf75e564cb0b",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "maxItems": 10
+      },
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        704,
+        144
+      ],
+      "id": "ee35e316-3f01-48d1-9ea1-d9ef965e4b64",
+      "name": "Limit"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        928,
+        144
+      ],
+      "id": "f94894a6-8ee5-4aa2-bce2-53da18cfe532",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "amount": 1
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1888,
+        112
+      ],
+      "id": "9eddbb16-d19a-48df-98bd-7a77ef57d4a7",
+      "name": "Wait",
+      "webhookId": "29c6bf47-acd8-4237-812e-86e0e402c78d"
+    },
+    {
+      "parameters": {
+        "operation": "scrape",
+        "url": "={{ $json.url }}",
+        "scrapeOptions": {
+          "options": {
+            "formats": {
+              "format": [
+                {}
+              ]
+            },
+            "headers": {}
+          }
+        },
+        "requestOptions": {}
+      },
+      "type": "@mendable/n8n-nodes-firecrawl.firecrawl",
+      "typeVersion": 1,
+      "position": [
+        1184,
+        128
+      ],
+      "id": "fe40866c-668d-4bdb-ac3e-c8fd402d7ddf",
+      "name": "Scrape a url and get its content",
+      "credentials": {
+        "firecrawlApi": {
+          "id": "xwhhL1RMM4e3flKP",
+          "name": "nick@nicksaraev.com (Oct 26th, 2025)"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "operation": "Run actor and get dataset",
+        "actorId": {
+          "__rl": true,
+          "value": "nFJndFXA5zjCTuudP",
+          "mode": "list",
+          "cachedResultName": "Google Search Results Scraper (apify/google-search-scraper)",
+          "cachedResultUrl": "https://console.apify.com/actors/nFJndFXA5zjCTuudP/input"
+        },
+        "customBody": "{\n    \"countryCode\": \"ca\",\n    \"focusOnPaidAds\": false,\n    \"forceExactMatch\": false,\n    \"includeIcons\": false,\n    \"includeUnfilteredResults\": true,\n    \"languageCode\": \"en\",\n    \"maxPagesPerQuery\": 5,\n    \"mobileResults\": true,\n    \"queries\": \"calgary dentist\",\n    \"resultsPerPage\": 10,\n    \"saveHtml\": false,\n    \"saveHtmlToKeyValueStore\": false\n}",
+        "timeout": {},
+        "authentication": "apifyOAuth2Api"
+      },
+      "type": "@apify/n8n-nodes-apify.apify",
+      "typeVersion": 1,
+      "position": [
+        288,
+        144
+      ],
+      "id": "bd8f0183-eba6-473d-9334-f1a833096951",
+      "name": "Run an Actor and get dataset",
+      "credentials": {
+        "apifyOAuth2Api": {
+          "id": "W38CKtLios5OwXf6",
+          "name": "nickolassaraev@gmail.com (Oct 26 2025)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "organicResults",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        496,
+        144
+      ],
+      "id": "b0fdcc2e-63a8-4013-a43f-212c8724c71d",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1Z4I3JooM2PZmxv75hLWqwvut58UbrY7uTRa3mB5HjAg",
+          "mode": "list",
+          "cachedResultName": "Dental Lead Database",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Z4I3JooM2PZmxv75hLWqwvut58UbrY7uTRa3mB5HjAg/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Z4I3JooM2PZmxv75hLWqwvut58UbrY7uTRa3mB5HjAg/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "title": "={{ $('Loop Over Items').item.json.title }}",
+            "url": "={{ $('Loop Over Items').item.json.url }}",
+            "description": "={{ $('Loop Over Items').item.json.description }}",
+            "position": "={{ $('Loop Over Items').item.json.position }}",
+            "fetched_at": "={{ $now }}",
+            "summary": "={{ $json.message.content.summary }}",
+            "contact_email": "={{ $json.message.content.contact_email }}",
+            "contact_phone": "={{ $json.message.content.contact_phone }}",
+            "contact_address": "={{ $json.message.content.contact_address }}",
+            "contact_firstName": "={{ $json.message.content.contact_firstName }}",
+            "contact_lastName": "={{ $json.message.content.contact_lastName }}",
+            "facebook": "={{ $json.message.content.facebook }}",
+            "instagram": "={{ $json.message.content.instagram }}",
+            "twitter/x": "={{ $json.message.content.twitter/x }}",
+            "linkedin": "={{ $json.message.content.linkedin }}",
+            "tikTok": "={{ $json.message.content.tikTok }}",
+            "googleMyBusiness": "={{ $json.message.content.googleMyBusiness }}",
+            "icebreaker": "={{ $json.message.content.icebreaker }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "title",
+              "displayName": "title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "url",
+              "displayName": "url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "description",
+              "displayName": "description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "position",
+              "displayName": "position",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "fetched_at",
+              "displayName": "fetched_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "summary",
+              "displayName": "summary",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "contact_email",
+              "displayName": "contact_email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "contact_phone",
+              "displayName": "contact_phone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "contact_address",
+              "displayName": "contact_address",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "contact_firstName",
+              "displayName": "contact_firstName",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "contact_lastName",
+              "displayName": "contact_lastName",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "facebook",
+              "displayName": "facebook",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "instagram",
+              "displayName": "instagram",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "twitter/x",
+              "displayName": "twitter/x",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "linkedin",
+              "displayName": "linkedin",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "tikTok",
+              "displayName": "tikTok",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "googleMyBusiness",
+              "displayName": "googleMyBusiness",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "icebreaker",
+              "displayName": "icebreaker",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1696,
+        112
+      ],
+      "id": "a517752d-2640-4ed9-a832-db4a3557f568",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "5pnSWPrbjH12tR3W",
+          "name": "nick@nicksaraev.com (Oct 2 2025)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-5",
+          "mode": "list",
+          "cachedResultName": "GPT-5"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "You're a helpful, intelligent website scraping assistant. You specialize in dental sites. ",
+              "role": "system"
+            },
+            {
+              "content": "Using this page context, write ONE sentence that proves we read it and sounds human. 15 words max. This is your \"icebreaker\".\n\nUse this icebreaker format:\n\n\"Hey {name}. Love {shortenedVersionOfCompanyName}, big fan of {shortParaphrasedVersionOfSomethingPlausiblyUniqueAboutThem} (genius/very smart/etc).\"\n\nRules:\n- Keep the icebreaker variables extremely short and informal. Don't write long meandering variables over 5 words—keep them super short and imply we do the same thing, like \"Hey Jennifer. Love Macleod Trail Dental, big fan of doing same-day emergency work (we do so too!)\".\n\nIn addition to generating the icebreaker, scrape and extract as much business information from the page and linked sources as possible, including social media and contact data.\n\n⸻\n\nFull Output Schema (JSON)\n\n{\n  \"summary\": \"\",\n  \"icebreaker\": \"\",\n  \"contact_email\": \"\",\n  \"contact_phone\": \"\",\n  \"contact_address\": \"\",\n  \"contact_firstName\": \"\",\n  \"contact_lastName\": \"\",\n  \"facebook\": \"\",\n  \"instagram\": \"\",\n  \"twitter/x\": \"\",\n  \"linkedin\": \"\",\n  \"tikTok\": \"\",\n  \"googleMyBusiness\": \"\"\n}\n\n⸻\n\nInstructions / Behavior:\n\t1.\tScrape comprehensively:\n\t•\tParse visible text, meta tags, contact sections, and footer info.\n\t•\tCollect links to About, Contact, or Team pages.\n\t•\tFollow internal links up to one level deep for richer data.\n\t2.\tExtract structured data:\n\t•\tDetect contact name(s) from About/Team pages (split into first and last names).\n\t•\tCapture emails, phone numbers, and addresses from HTML and structured data (schema.org markup, JSON-LD, OpenGraph).\n\t•\tDetect and standardize social media URLs (Facebook, Instagram, Twitter/X, LinkedIn, TikTok, Google My Business).\n\t3.\tSummarize the website in 2–3 sentences that describe:\n\t•\tWhat the business does.\n\t•\tIts unique angle or differentiator.\n\t4.\tGenerate the icebreaker using the format provided.\n\t•\tBe human, specific, and relevant.\n\t•\tMention automation value naturally (not forced).\n\t•\t15 words max.\n\t5.\tOutput only valid JSON — no commentary, no markdown formatting, no prose outside the JSON."
+            },
+            {
+              "content": "={{ $json.data.markdown }}"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {
+          "reasoning_effort": "low"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        1376,
+        112
+      ],
+      "id": "0c80762d-2258-42fd-8b93-cb3e82548828",
+      "name": "Extract Contact & Icebreaker",
+      "credentials": {
+        "openAiApi": {
+          "id": "oLLACDYfGm4C4ouV",
+          "name": "YouTube "
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Run an Actor and get dataset",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Scrape a url and get its content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Scrape a url and get its content": {
+      "main": [
+        [
+          {
+            "node": "Extract Contact & Icebreaker",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Run an Actor and get dataset": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Limit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Contact & Icebreaker": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "2766c6ab-915f-4988-acfa-9f7654e97077",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "d7661a849ead114a9aa6d9ceaf4160465aeb79532a35bde62160c840ffba9fc8"
+  },
+  "id": "cc9kj25IKwSM04ya",
+  "tags": []
+}
